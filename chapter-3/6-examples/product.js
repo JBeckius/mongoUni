@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Category = require('./category');
 var fx = require('./fx');
 
+//contains basic metadata
 var productSchema = {
   name: { type: String, required: true },
   // Pictures must start with "http://"

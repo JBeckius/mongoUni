@@ -56,6 +56,7 @@ describe('Category API', function() {
       var url = URL_ROOT + '/product/id/' + PRODUCT_ID;
       // Make an HTTP request to
       // "localhost:3000/product/id/000000000000000000000001"
+      //using superagent
       superagent.get(url, function(error, res) {
         assert.ifError(error);
         var result;
@@ -71,7 +72,9 @@ describe('Category API', function() {
     });
   });
 
+  //this guy is more complex, because it needs to create a bunch of data to test
   it('can load all products in a category with sub-categories', function(done) {
+    //set up categories
     var categories = [
       { _id: 'Electronics' },
       { _id: 'Phones', parent: 'Electronics' },
@@ -79,6 +82,7 @@ describe('Category API', function() {
       { _id: 'Bacon' }
     ];
 
+    //set up products to go in categories
     var products = [
       {
         name: 'LG G4',
@@ -106,14 +110,15 @@ describe('Category API', function() {
       }
     ];
 
-    // Create 4 categories
+    // Create the 4 categories using Mongoose model
     Category.create(categories, function(error, categories) {
       assert.ifError(error);
-      // And 3 products
+      // And our 3 products using Mongoose model
       Product.create(products, function(error, products) {
         assert.ifError(error);
         var url = URL_ROOT + '/product/category/Electronics';
         // Make an HTTP request to localhost:3000/product/ancestor/Electronics
+        //using superagent
         superagent.get(url, function(error, res) {
           assert.ifError(error);
           var result;
@@ -126,6 +131,9 @@ describe('Category API', function() {
           assert.equal(result.products[1].name, 'LG G4');
 
           // Sort by price, ascending
+          //remember the query param stuff.
+          //?anything after the url specifies a query parameter.
+          //in this case, whether or not we want to sort by price
           var url = URL_ROOT + '/product/category/Electronics?price=1';
           superagent.get(url, function(error, res) {
             assert.ifError(error);
@@ -134,7 +142,7 @@ describe('Category API', function() {
               result = JSON.parse(res.text);
             });
             assert.equal(result.products.length, 2);
-            // Should be in ascending order by name
+            // Should be in ascending order by price
             assert.equal(result.products[0].name, 'LG G4');
             assert.equal(result.products[1].name, 'Asus Zenbook Prime');
             done();

@@ -3,26 +3,29 @@ var _ = require('underscore');
 
 module.exports = function(wagner) {
   mongoose.connect('mongodb://localhost:27017/test');
-  //Create category model
+
+  wagner.factory('db', function() {
+    return mongoose;
+  });
+
   var Category =
     mongoose.model('Category', require('./category'), 'categories');
-  //create product model
-  var Product =
-    mongoose.model('Product', require('./product'), 'products');
+  var User =
+    mongoose.model('User', require('./user'), 'users');
 
   var models = {
     Category: Category,
-    Product: Product
+    User: User
   };
 
   // To ensure DRY-ness, register factories in a loop
-              //D-R-Y Don't repeat yourself
-  //This calls wagner.factory for each of our models
   _.each(models, function(value, key) {
     wagner.factory(key, function() {
       return value;
     });
   });
+
+  wagner.factory('Product', require('./product'));
 
   return models;
 };
